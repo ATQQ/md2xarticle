@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Markdown → X 文章",
+  "version": "1.0.0",
+  "description": "在 X 文章编辑器里粘贴 Markdown，自动转成富文本并上传图片。只写当前编辑器，不新建草稿。",
+  "host_permissions": [
+    "https://x.com/*",
+    "https://twitter.com/*",
+    "https://*/*",
+    "http://*/*"
+  ],
+  "background": {
+    "service_worker": "src/bg.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://x.com/*", "https://twitter.com/*"],
+      "js": ["vendor/marked.min.js", "src/panel.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://x.com/*", "https://twitter.com/*"],
+      "js": ["src/main.js"],
+      "run_at": "document_idle",
+      "world": "MAIN"
+    }
+  ]
+}

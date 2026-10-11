@@ -1,0 +1,10 @@
+# macOS
+.DS_Store
+
+# 打包产物（用 Chrome 的「打包扩展程序」会生成，不入库）
+*.crx
+*.pem
+*.zip
+
+# 依赖（本仓库零依赖，留着以防以后加工具链）
+node_modules/

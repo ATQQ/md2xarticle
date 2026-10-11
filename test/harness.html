@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh">
+<head><meta charset="utf-8"><title>xmd 测试台</title></head>
+<body>
+<h1>harness</h1>
+
+<script src="../vendor/marked.min.js"></script>
+<script>
+  // 模拟扩展环境（panel.js 会用到 chrome.runtime）
+  window.chrome = {
+    runtime: {
+      lastError: null,
+      sendMessage: function (m, cb) { if (cb) cb({ ok: false, error: 'mock: 测试中禁用远程抓取' }); },
+      onMessage: { addListener: function () {} },
+    },
+  };
+</script>
+
+<script src="../src/panel.js"></script>
+<script src="../src/main.js"></script>
+
+<script>
+  /* 造一个假的 X 编辑器：带 React fiber 结构，
+     用来验证 main.js 能否在没有真实 X 页面的情况下定位到 Draft 实例 */
+  window.__mockHolder = { props: { editorState: { __mock: true }, onChange: function () {} } };
+  window.__mockEditor = document.createElement('div');
+  window.__mockEditor.setAttribute('contenteditable', 'true');
+  window.__mockEditor.id = 'mock-editor';
+  window.__mockEditor['__reactFiber$mock'] = { stateNode: window.__mockHolder };
+  document.body.appendChild(window.__mockEditor);
+
+  // 标题框（按真实 X 的结构包一层）
+  var wrap = document.createElement('div');
+  wrap.setAttribute('data-testid', 'twitter-article-title');
+  var ta = document.createElement('textarea');
+  ta.placeholder = 'Add a title';
+  wrap.appendChild(ta);
+  document.body.appendChild(wrap);
+  window.__mockTitle = ta;
+</script>
+</body>
+</html>
