@@ -488,6 +488,15 @@ h2 {
   letter-spacing: 0.12em;
 }
 
+.tip-warning {
+  border-left-color: var(--accent);
+  background: rgba(216, 74, 47, 0.07);
+}
+
+.tip-warning .tip-label {
+  color: var(--accent-dark);
+}
+
 .steps {
   display: grid;
   grid-template-columns: 1fr 1fr;
