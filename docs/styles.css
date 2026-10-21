@@ -525,6 +525,100 @@ h2 {
   font-size: 12px;
 }
 
+.entry-callout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.78fr) 1.22fr;
+  min-height: 290px;
+  margin-top: 30px;
+  overflow: hidden;
+  color: var(--white);
+  background: var(--ink);
+}
+
+.entry-callout-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+}
+
+.entry-label {
+  margin-bottom: 17px;
+  color: #e67a62;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.entry-callout h3 {
+  max-width: 360px;
+  margin-bottom: 14px;
+  font-family: var(--display);
+  font-size: clamp(27px, 3vw, 36px);
+  font-weight: 500;
+  line-height: 1.16;
+  letter-spacing: -0.035em;
+}
+
+.entry-callout p {
+  max-width: 340px;
+  margin: 0;
+  color: rgba(255, 253, 248, 0.68);
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.entry-demo {
+  position: relative;
+  min-height: 290px;
+  overflow: hidden;
+  background: #fff;
+  border-left: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.entry-demo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 24px 0 60px rgba(23, 23, 19, 0.07);
+}
+
+.entry-demo img {
+  position: absolute;
+  top: 50%;
+  left: -8%;
+  width: 116%;
+  max-width: none;
+  transform: translateY(-64%);
+}
+
+.entry-demo-label {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 2;
+  padding: 6px 10px;
+  color: var(--ink);
+  background: rgba(243, 239, 229, 0.9);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.05em;
+}
+
+.entry-demo-corner {
+  position: absolute;
+  right: 22px;
+  bottom: 18px;
+  z-index: 2;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 24px;
+  line-height: 1;
+}
+
 .faq-list {
   margin-left: 92px;
   border-top: 1px solid var(--ink);
@@ -652,6 +746,16 @@ details p {
     grid-template-columns: 1fr;
   }
 
+  .entry-callout {
+    grid-template-columns: 1fr;
+  }
+
+  .entry-demo {
+    min-height: 260px;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    border-left: 0;
+  }
+
   .faq-list {
     margin-left: 0;
   }
@@ -736,6 +840,19 @@ details p {
   .steps li {
     grid-template-columns: 44px 1fr;
     gap: 13px;
+  }
+
+  .entry-callout-copy {
+    padding: 30px 25px;
+  }
+
+  .entry-demo {
+    min-height: 235px;
+  }
+
+  .entry-demo img {
+    left: -12%;
+    width: 124%;
   }
 
   summary {
