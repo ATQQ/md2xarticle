@@ -5,6 +5,7 @@
 *.crx
 *.pem
 *.zip
+dist/
 
 # 依赖（本仓库零依赖，留着以防以后加工具链）
 node_modules/
