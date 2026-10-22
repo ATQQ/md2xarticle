@@ -255,6 +255,82 @@
   .tip.ok { background: #e7f8ef; border-color: #c6ecd9; color: #0a6b41; }
   .diag { margin-top: 8px; }
   .diag button { flex: none; width: 100%; font-size: 11px; font-weight: 500; color: #536471; }
+  .finish {
+    position: fixed; inset: 0; z-index: 3; display: flex; align-items: flex-start; justify-content: center;
+    padding-top: clamp(70px, 14vh, 150px); pointer-events: none; opacity: 0;
+    transition: opacity .2s ease;
+  }
+  .finish.show { opacity: 1; }
+  .finish.out { opacity: 0; }
+  .finish-glow {
+    position: absolute; top: 8vh; width: 420px; height: 180px; border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(0, 186, 124, .34), rgba(29, 155, 240, .12) 45%, transparent 72%);
+    filter: blur(24px); opacity: 0;
+  }
+  .finish.show .finish-glow { animation: finish-glow .9s ease-out both; }
+  .finish-card {
+    position: relative; display: flex; align-items: center; gap: 12px; min-width: 218px;
+    padding: 12px 18px 12px 12px; border-radius: 16px; color: #fff;
+    background: linear-gradient(135deg, #0b1117 0%, #101d22 100%);
+    border: 1px solid rgba(255, 255, 255, .13);
+    box-shadow: 0 18px 55px rgba(0, 0, 0, .34), 0 0 0 1px rgba(0, 186, 124, .08);
+    transform: translateY(14px) scale(.92); opacity: 0;
+  }
+  .finish.show .finish-card { animation: finish-pop .56s cubic-bezier(.2, .9, .22, 1.18) both; }
+  .finish.out .finish-card { animation: finish-out .24s ease-in both; }
+  .finish-icon {
+    width: 42px; height: 42px; flex: none; border-radius: 13px; display: grid; place-items: center;
+    background: #00ba7c; box-shadow: 0 0 0 7px rgba(0, 186, 124, .12), 0 8px 22px rgba(0, 186, 124, .28);
+  }
+  .finish-icon svg { width: 24px; height: 24px; overflow: visible; }
+  .finish-icon path {
+    fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 26; stroke-dashoffset: 26;
+  }
+  .finish.show .finish-icon path { animation: finish-check .42s .16s cubic-bezier(.65, 0, .35, 1) forwards; }
+  .finish-copy { display: flex; flex-direction: column; gap: 2px; white-space: nowrap; }
+  .finish-copy strong { font-size: 15px; line-height: 1.25; font-weight: 750; letter-spacing: .01em; }
+  .finish-copy small { color: #a8b8c2; font-size: 11.5px; line-height: 1.35; }
+  .finish.is-warn .finish-icon { background: #f59e0b; box-shadow: 0 0 0 7px rgba(245, 158, 11, .13), 0 8px 22px rgba(245, 158, 11, .25); }
+  .finish.is-warn .finish-glow {
+    background: radial-gradient(ellipse, rgba(245, 158, 11, .28), rgba(255, 107, 107, .08) 48%, transparent 72%);
+  }
+  .finish-bits { position: absolute; left: 50%; top: 33px; width: 0; height: 0; }
+  .finish-bits i {
+    position: absolute; left: 0; top: 0; width: 7px; height: 12px; border-radius: 2px;
+    background: var(--c); opacity: 0;
+  }
+  .finish.show .finish-bits i {
+    animation: finish-burst .92s var(--delay) cubic-bezier(.1, .72, .2, 1) both;
+  }
+  @keyframes finish-pop {
+    0% { opacity: 0; transform: translateY(14px) scale(.92); }
+    60% { opacity: 1; transform: translateY(-2px) scale(1.018); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes finish-out {
+    to { opacity: 0; transform: translateY(-7px) scale(.97); }
+  }
+  @keyframes finish-check { to { stroke-dashoffset: 0; } }
+  @keyframes finish-glow {
+    0% { opacity: 0; transform: scale(.72); }
+    42% { opacity: 1; }
+    100% { opacity: 0; transform: scale(1.22); }
+  }
+  @keyframes finish-burst {
+    0% { opacity: 0; transform: translate(-50%, -50%) rotate(0) scale(.35); }
+    9% { opacity: 1; }
+    100% {
+      opacity: 0;
+      transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(var(--r)) scale(var(--s));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .finish, .finish-card, .finish-icon path, .finish-glow, .finish-bits i { animation: none !important; transition: none !important; }
+    .finish.show .finish-card { opacity: 1; transform: none; }
+    .finish.show .finish-icon path { stroke-dashoffset: 0; }
+    .finish-bits { display: none; }
+  }
 </style>
 <div class="fab" id="fab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg><span>导入 Markdown</span></div>
 <div class="panel" id="panel">
@@ -282,6 +358,19 @@
   <div class="msg" id="msg"></div>
   <div class="hint">本扩展只写你当前打开的那篇文章：不会新建草稿、不会覆盖已有标题，也只会在文章页出现。</div>
   <div class="diag"><button id="probe">定位失败？点这里导出诊断信息</button></div>
+</div>
+<div class="finish" id="finish" role="status" aria-live="polite" aria-atomic="true">
+  <div class="finish-glow"></div>
+  <div class="finish-card">
+    <span class="finish-icon">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>
+    </span>
+    <span class="finish-copy">
+      <strong id="finishTitle"></strong>
+      <small id="finishDetail"></small>
+    </span>
+    <span class="finish-bits" id="finishBits" aria-hidden="true"></span>
+  </div>
 </div>`;
 
   const $ = (s) => shadow.querySelector('#' + s);
@@ -320,6 +409,53 @@
   }
 
   const msg = (t, cls = '') => { const el = $('msg'); el.className = 'msg ' + cls; el.textContent = t; };
+  const reduceMotion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  let finishTimer = 0;
+  let closeTimer = 0;
+
+  function celebrate(r) {
+    const failed = (r && r.failed) || [];
+    const hasFailed = failed.length > 0;
+    const title = $('finishTitle');
+    const detail = $('finishDetail');
+    const box = $('finishBits');
+    const finish = $('finish');
+
+    title.textContent = '导入完成';
+    detail.textContent = hasFailed
+      ? `第 ${failed.join('、')} 张图片需要重试`
+      : r && r.hadText ? '已追加到当前文章' : '文章已写入编辑器';
+    finish.classList.toggle('is-warn', hasFailed);
+    finish.classList.remove('show', 'out');
+    box.replaceChildren();
+    void finish.offsetWidth;
+
+    if (!hasFailed && !(reduceMotion && reduceMotion.matches)) {
+      const colors = ['#00ba7c', '#1d9bf0', '#ffd400', '#ff6b6b', '#ffffff'];
+      for (let i = 0; i < 28; i++) {
+        const angle = (Math.PI * 2 * i) / 28 + (Math.random() - 0.5) * 0.28;
+        const distance = 58 + Math.random() * 92;
+        const bit = document.createElement('i');
+        bit.style.setProperty('--x', `${Math.cos(angle) * distance}px`);
+        bit.style.setProperty('--y', `${Math.sin(angle) * distance - 22}px`);
+        bit.style.setProperty('--r', `${Math.round((Math.random() - 0.5) * 540)}deg`);
+        bit.style.setProperty('--s', (0.65 + Math.random() * 0.85).toFixed(2));
+        bit.style.setProperty('--c', colors[i % colors.length]);
+        bit.style.setProperty('--delay', `${Math.round(Math.random() * 90)}ms`);
+        bit.style.height = `${8 + Math.round(Math.random() * 8)}px`;
+        box.appendChild(bit);
+      }
+    }
+
+    finish.classList.add('show');
+    clearTimeout(closeTimer);
+    if (!hasFailed) closeTimer = setTimeout(closePanel, 700);
+    clearTimeout(finishTimer);
+    finishTimer = setTimeout(() => {
+      finish.classList.add('out');
+      finishTimer = setTimeout(() => finish.classList.remove('show', 'out'), 260);
+    }, 2600);
+  }
 
   // 导入中的 UI 状态：主按钮禁用 + 出现「中断」
   function setBusyUI(v) { $('go').disabled = v; $('cancel').hidden = !v; }
@@ -435,6 +571,7 @@
       if (r && r.hadText) parts.push('（编辑器里原有内容，本次是追加）');
       if (r && r.failed && r.failed.length) parts.push(`\n有 ${r.failed.length} 张图没插进去：第 ${r.failed.join('、')} 张`);
       msg(parts.join(' '), r && r.failed && r.failed.length ? 'err' : 'ok');
+      celebrate(r);
     } catch (e) {
       const isAbort = aborted || /已中断/.test(e.message || '');
       $('pb').style.width = isAbort ? '0%' : '0%';
@@ -605,6 +742,7 @@
     queue: () => queue,
     busy: () => busy,
     setBusyUI,
+    celebrate,
     syncVisible,
     onArticlePage,
     tip: () => { const e = $('tip'); return { cls: e.className, html: e.innerHTML, hostDisplay: host.style.display }; },
