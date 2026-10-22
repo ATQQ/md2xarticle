@@ -18,7 +18,7 @@ rm -rf "$STAGE"
 mkdir -p "$STAGE"
 
 cp "$ROOT/manifest.json" "$ROOT/README.md" "$ROOT/LICENSE" "$STAGE/"
-cp -R "$ROOT/src" "$ROOT/vendor" "$STAGE/"
+cp -R "$ROOT/src" "$ROOT/vendor" "$ROOT/icons" "$STAGE/"
 find "$STAGE" -name ".DS_Store" -delete
 
 rm -f "$VERSIONED_ZIP" "$LATEST_ZIP" "$DIST/SHA256SUMS"

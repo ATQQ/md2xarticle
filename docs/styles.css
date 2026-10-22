@@ -79,17 +79,13 @@ code {
 }
 
 .brand-mark {
-  width: 33px;
-  height: 33px;
-  display: inline-grid;
-  place-items: center;
-  color: var(--white);
-  background: var(--ink);
-  border-radius: 50%;
-  font-family: var(--display);
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.08em;
+  width: 35px;
+  height: 35px;
+  display: block;
+  flex: none;
+  object-fit: cover;
+  border-radius: 9px;
+  box-shadow: 0 5px 16px rgba(23, 23, 19, 0.16);
 }
 
 .nav {

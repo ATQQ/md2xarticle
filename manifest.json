@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Markdown → X 文章",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "在 X 文章编辑器里粘贴 Markdown，自动转成富文本并上传图片。只写当前编辑器，不新建草稿。",
   "host_permissions": [
     "https://x.com/*",
@@ -14,15 +14,39 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://x.com/*", "https://twitter.com/*"],
-      "js": ["vendor/marked.min.js", "src/panel.js"],
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ],
+      "js": [
+        "vendor/marked.min.js",
+        "src/panel.js"
+      ],
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://x.com/*", "https://twitter.com/*"],
-      "js": ["src/main.js"],
+      "matches": [
+        "https://x.com/*",
+        "https://twitter.com/*"
+      ],
+      "js": [
+        "src/main.js"
+      ],
       "run_at": "document_idle",
       "world": "MAIN"
     }
-  ]
+  ],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Markdown → X 文章",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  }
 }
