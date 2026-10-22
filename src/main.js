@@ -74,6 +74,8 @@
   const ES = () => HOLDER.props.editorState;
   const content = () => ES().getCurrentContent();
   const blocks = () => content().getBlockMap();
+  const INVISIBLE_RE = /[\u200B-\u200D\u2060\uFEFF]/g;
+  const escapeRe = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
   // 图片块身份：上传中 key 会变，用实体里的 localMediaId 认，退回 block key
   function atomId(c, b) {
@@ -143,7 +145,32 @@
     return es;
   }
 
-  // 把新插入的图片块挪到 marker 段的位置，并删掉 marker 段
+  // 只剔除文本里的占位符；X 若把占位符和正文合并到一段，也不会误删正文
+  function stripMarkersFromBlock(block, re) {
+    const text = block.getText();
+    re.lastIndex = 0;
+    if (!re.test(text)) return block;
+
+    const chars = block.getCharacterList();
+    let nextText = '';
+    let nextChars = null;
+    let last = 0;
+    let match;
+    re.lastIndex = 0;
+    while ((match = re.exec(text))) {
+      nextText += text.slice(last, match.index);
+      const part = chars.slice(last, match.index);
+      nextChars = nextChars ? nextChars.concat(part) : part;
+      last = match.index + match[0].length;
+    }
+    nextText += text.slice(last);
+    const tail = chars.slice(last);
+    nextChars = nextChars ? nextChars.concat(tail) : tail;
+
+    return block.set('text', nextText).set('characterList', nextChars);
+  }
+
+  // 把新插入的图片块挪到 marker 段的位置，同时清掉同内容的重复占位段
   function moveInto(atomKey, markerText) {
     const es = ES();
     const c = es.getCurrentContent();
@@ -160,9 +187,20 @@
         else m.set(k, blk);
       });
     });
+    const re = new RegExp(escapeRe(markerText), 'g');
+    const withDuplicatesRemoved = next.withMutations((m) => {
+      next.forEach((blk, k) => {
+        if (k === atomKey || blk.getType() === 'atomic') return;
+        re.lastIndex = 0;
+        if (!re.test(blk.getText())) return;
+        const clean = stripMarkersFromBlock(blk, re);
+        if (!clean.getText().replace(INVISIBLE_RE, '').trim()) m.delete(k);
+        else m.set(k, clean);
+      });
+    });
     const SS = es.getSelection().constructor;
-    const sel = SS.createEmpty(next.last().getKey());
-    const nc = c.set('blockMap', next).set('selectionBefore', sel).set('selectionAfter', sel);
+    const sel = SS.createEmpty(withDuplicatesRemoved.last().getKey());
+    const nc = c.set('blockMap', withDuplicatesRemoved).set('selectionBefore', sel).set('selectionAfter', sel);
     HOLDER.props.onChange(es.constructor.push(es, nc, 'insert-fragment'));
     return es;
   }
